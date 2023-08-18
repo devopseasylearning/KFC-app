@@ -31,7 +31,7 @@ pipeline {
 
                         string(
                              defaultValue: '50',
-                             name:7'KFC_tag',
+                             name:'KFC_tag',
                              description: '''Please ente7 KFC  image tage to be used''',
                             ),
 
