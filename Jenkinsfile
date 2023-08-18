@@ -249,7 +249,7 @@ rm -rf KFC-app || true
 git clone git@github.com:devopseasylearning/KFC-app.git
 cd KFC-app
 
-cat << EOF > KFC-app/kfc-charts/dev-values.yaml
+cat << EOF > kfc-charts/dev-values.yaml
 image:
   repository: devopseasylearning/kfc
   tag: v1.0.${BUILD_NUMBER}
