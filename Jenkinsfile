@@ -25,7 +25,7 @@ pipeline {
 
                         string(
                              defaultValue: 'develop',
-                             name: 'Please_leave_this_section_as_it_is',
+                             name: 'origin',
                             ),
                         ]),
 
@@ -302,7 +302,7 @@ post {
 
 
 def notifyBACKUP (String buildResult, String whereAt) {
-  if (Please_leave_this_section_as_it_is == 'origin/develop') {
+  if (origin == 'origin/develop') {
     channel = 'development-alerts'
   } else {
     channel = 'development-alerts'
