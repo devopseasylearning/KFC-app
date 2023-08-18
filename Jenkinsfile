@@ -21,7 +21,7 @@ pipeline {
 
                              string(name: 'WARNTIME',
                              defaultValue: '0',
-                            description: '''Warning time (in minutes) before starting BACKUP '''),
+                            description: '''Warning time (in minutes) before starting KFC '''),
 
                         string(
                              defaultValue: 'develop',
@@ -40,7 +40,7 @@ pipeline {
        stage('warning') {
       steps {
         script {
-            notifyBACKUP (currentBuild.currentResult, "WARNING")
+            notifyKFC (currentBuild.currentResult, "WARNING")
             sleep(time:env.WARNTIME, unit:"MINUTES")
         }
       }
@@ -289,7 +289,7 @@ git push
 post {
     always {
       script {
-        notifyBACKUP (currentBuild.currentResult, "POST")
+        notifyKFC (currentBuild.currentResult, "POST")
       }
     }
     
@@ -301,7 +301,7 @@ post {
 
 
 
-def notifyBACKUP (String buildResult, String whereAt) {
+def notifyKFC (String buildResult, String whereAt) {
   if (Please_leave_this_section_as_it_is == 'origin/develop') {
     channel = 'development-alerts'
   } else {
