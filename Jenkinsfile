@@ -162,7 +162,7 @@ pipeline {
                     // Log in to Docker Hub
                     sh '''
                        
-                        sleep 10
+                        docker push devopseasylearning/kfc:v1.0.${BUILD_NUMBER}
                         
                     '''
                 }
