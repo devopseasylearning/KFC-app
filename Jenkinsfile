@@ -17,31 +17,13 @@ pipeline {
                 script {
                     properties([
                         parameters([
-                            choice(
-                                choices: ['DEV', 'QA', 'PREPROD'], 
-                                name: 'ENVIRONMENT'
-                            ),
-
-
-                        string(
-                             defaultValue: '50',
-                             name: 'ui_tag',
-                             description: '''Please enter ui image tage to be used''',
-                            ),
-
-                        string(
-                             defaultValue: '50',
-                             name:'KFC_tag',
-                             description: '''Please ente7 KFC  image tage to be used''',
-                            ),
-
 
                              string(name: 'WARNTIME',
                              defaultValue: '0',
                             description: '''Warning time (in minutes) before starting upgrade'''),
 
                         string(
-                             defaultValue: 'develop',
+                             defaultValue: 'master',
                              name: 'Please_leave_this_section_as_it_is',
                             ),
 
