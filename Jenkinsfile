@@ -1,7 +1,7 @@
 pipeline {
     agent any 
     options {
-        buildDiscarder(logRotator(numToKeepStr: '5'))
+        buildDiscarder(logRotator(numToKeepStr: '20'))
         disableConcurrentBuilds()
         timeout (time: 60, unit: 'MINUTES')
         timestamps()
@@ -12,7 +12,39 @@ pipeline {
 
 
     stages {
+        stage('Setup parameters') {
+            steps {
+                script {
+                    properties([
+                        parameters([
 
+
+                             string(name: 'WARNTIME',
+                             defaultValue: '0',
+                            description: '''Warning time (in minutes) before starting BACKUP '''),
+
+                        string(
+                             defaultValue: 'develop',
+                             name: 'Please_leave_this_section_as_it_is',
+                            ),
+                        ]),
+
+
+
+                    ])
+                }
+            }
+        }
+
+
+       stage('warning') {
+      steps {
+        script {
+            notifyBACKUP (currentBuild.currentResult, "WARNING")
+            sleep(time:env.WARNTIME, unit:"MINUTES")
+        }
+      }
+    }
 
 
 
@@ -21,7 +53,7 @@ pipeline {
 
             steps {
                 script {
-                    
+                    // Log in to Docker Hub
                     sh '''
                      sleep 10
                     '''
@@ -34,7 +66,7 @@ pipeline {
 
             steps {
                 script {
-                    
+                    // Log in to Docker Hub
                     sh '''
                      sleep 10
                     '''
@@ -48,7 +80,7 @@ pipeline {
 
             steps {
                 script {
-                    
+                    // Log in to Docker Hub
                     sh '''
                      sleep 10
                     '''
@@ -61,7 +93,7 @@ pipeline {
 
             steps {
                 script {
-                    
+                    // Log in to Docker Hub
                     sh '''
                      sleep 10
                     '''
@@ -97,7 +129,7 @@ pipeline {
         stage('Docker Login') {
             steps {
                 script {
-                    
+                    // Log in to Docker Hub
                     sh '''
                         echo "${DOCKERHUB_CREDS_PSW}" | docker login --username "${DOCKERHUB_CREDS_USR}" --password-stdin
                     '''
@@ -111,7 +143,7 @@ pipeline {
 
             steps {
                 script {
-                    
+                    // Log in to Docker Hub
                     sh '''
                        
                         docker build -t devopseasylearning/kfc:v1.0.${BUILD_NUMBER} .
@@ -127,7 +159,7 @@ pipeline {
 
             steps {
                 script {
-                    
+                    // Log in to Docker Hub
                     sh '''
                        
                         docker push devopseasylearning/kfc:${BUILD_NUMBER} 
@@ -143,7 +175,7 @@ pipeline {
 
             steps {
                 script {
-                    
+                    // Log in to Docker Hub
                     sh '''
                      sleep 10
                     '''
@@ -156,7 +188,7 @@ pipeline {
 
             steps {
                 script {
-                    
+                    // Log in to Docker Hub
                     sh '''
                         
                         sleep 10
@@ -170,7 +202,7 @@ pipeline {
  
             steps {
                 script {
-                    
+                    // Log in to Docker Hub
                     sh '''
                      sleep 10
                     '''
@@ -184,7 +216,7 @@ pipeline {
     
             steps {
                 script {
-                    
+                    // Log in to Docker Hub
                     sh '''
                         sleep 10
                       
@@ -199,7 +231,7 @@ pipeline {
 
             steps {
                 script {
-                    
+                    // Log in to Docker Hub
                     sh '''
                       sleep
                     '''
@@ -244,7 +276,7 @@ git push
 
             steps {
                 script {
-                    
+                    // Log in to Docker Hub
                     sh '''
                       sleep 200
                     '''
@@ -254,25 +286,48 @@ git push
 
     }
 
-   post {
-   
-   success {
-      slackSend (channel: '#development-alerts', color: 'good', message: "SUCCESSFUL: Application KFC  Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+post {
+    always {
+      script {
+        notifyBACKUP (currentBuild.currentResult, "POST")
+      }
     }
-
- 
-    unstable {
-      slackSend (channel: '#development-alerts', color: 'warning', message: "UNSTABLE: Application KFC  Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
-    }
-
-    failure {
-      slackSend (channel: '#development-alerts', color: '#FF0000', message: "FAILURE: Application KFC Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
-    }
-   
+    
+  }
 
 }
 
 
+
+
+
+def notifyBACKUP (String buildResult, String whereAt) {
+  if (Please_leave_this_section_as_it_is == 'origin/develop') {
+    channel = 'development-alerts'
+  } else {
+    channel = 'development-alerts'
+  }
+  if (buildResult == "SUCCESS") {
+    switch(whereAt) {
+      case 'WARNING':
+        slackSend(channel: channel,
+                color: "#439FE0",
+                message: "KFC-app:   starting in ${env.WARNTIME} minutes @ ${env.BUILD_URL} ")
+        break
+    case 'STARTING':
+      slackSend(channel: channel,
+                color: "good",
+                message: "KFC-app: Starting   @ ${env.BUILD_URL}")
+      break
+    default:
+        slackSend(channel: channel,
+                color: "good",
+                message: "KFC-app:   completed successfully @ ${env.BUILD_URL} ")
+        break
+    }
+  } else {
+    slackSend(channel: channel,
+              color: "danger",
+              message: "KFC-app:   was not successful. Please investigate it immediately.  @ ${env.BUILD_URL} ")
+  }
 }
-
-
