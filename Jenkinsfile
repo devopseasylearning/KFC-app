@@ -162,7 +162,7 @@ pipeline {
                     // Log in to Docker Hub
                     sh '''
                        
-                        docker push devopseasylearning/kfc:${BUILD_NUMBER} 
+                        sleep 10
                         
                     '''
                 }
@@ -233,7 +233,7 @@ pipeline {
                 script {
                     // Log in to Docker Hub
                     sh '''
-                      sleep
+                      sleep 10
                     '''
                 }
             }
