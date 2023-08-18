@@ -10,25 +10,26 @@ pipeline {
         DOCKERHUB_CREDS = credentials('dockerhub-creds') 
     }
 
-    stages {
 
+    stages {
         stage('Setup parameters') {
             steps {
                 script {
                     properties([
                         parameters([
 
+
                              string(name: 'WARNTIME',
                              defaultValue: '0',
-                            description: '''Warning time (in minutes) before starting upgrade'''),
+                            description: '''Warning time (in minutes) before starting BACKUP '''),
 
                         string(
-                             defaultValue: 'master',
+                             defaultValue: 'develop',
                              name: 'Please_leave_this_section_as_it_is',
                             ),
-
-
                         ]),
+
+
 
                     ])
                 }
@@ -39,11 +40,13 @@ pipeline {
        stage('warning') {
       steps {
         script {
-            notifyUpgrade(currentBuild.currentResult, "WARNING")
+            notifyBACKUP (currentBuild.currentResult, "WARNING")
             sleep(time:env.WARNTIME, unit:"MINUTES")
         }
       }
     }
+
+
 
 
         stage('Build binaries') {
@@ -98,6 +101,9 @@ pipeline {
             }
         }
 
+
+
+
          stage('SonarQube analysis') {
 
             agent {
@@ -116,6 +122,8 @@ pipeline {
                 }
             }
         }
+
+
 
 
         stage('Docker Login') {
@@ -144,6 +152,7 @@ pipeline {
                 }
             }
         }
+
 
 
         stage('push client ') {
@@ -202,6 +211,7 @@ pipeline {
         }
 
 
+
         stage('push database ') {
     
             steps {
@@ -228,12 +238,6 @@ pipeline {
                 }
             }
         }
-
-
-
-
-
-
 
    stage('Update KFC-app  charts') {
 
@@ -265,6 +269,9 @@ git push
         }
 
 
+
+
+
         stage('Launch/deploy application ') {
 
             steps {
@@ -277,30 +284,25 @@ git push
             }
         }
 
-
-
-}
+    }
 
 post {
     always {
       script {
-        notifyUpgrade(currentBuild.currentResult, "POST")
+        notifyBACKUP (currentBuild.currentResult, "POST")
       }
     }
     
   }
 
-
-
 }
 
 
 
 
 
-
-def notifyUpgrade(String buildResult, String whereAt) {
-  if (Please_leave_this_section_as_it_is == 'origin/master') {
+def notifyBACKUP (String buildResult, String whereAt) {
+  if (Please_leave_this_section_as_it_is == 'origin/develop') {
     channel = 'development-alerts'
   } else {
     channel = 'development-alerts'
@@ -310,22 +312,22 @@ def notifyUpgrade(String buildResult, String whereAt) {
       case 'WARNING':
         slackSend(channel: channel,
                 color: "#439FE0",
-                message: "s7-KFC-app: Upgrade starting in ${env.WARNTIME} minutes @ ${env.BUILD_URL}  Application s7-KFC-app")
+                message: "KFC-app:   starting in ${env.WARNTIME} minutes @ ${env.BUILD_URL} ")
         break
     case 'STARTING':
       slackSend(channel: channel,
                 color: "good",
-                message: "s7-KFC-app: Starting upgrade @ ${env.BUILD_URL} Application s7-KFC-app")
+                message: "KFC-app: Starting   @ ${env.BUILD_URL}")
       break
     default:
         slackSend(channel: channel,
                 color: "good",
-                message: "s7-KFC-app: Upgrade completed successfully @ ${env.BUILD_URL}  Application s7-KFC-app")
+                message: "KFC-app:   completed successfully @ ${env.BUILD_URL} ")
         break
     }
   } else {
     slackSend(channel: channel,
               color: "danger",
-              message: "s7-KFC-app: Upgrade was not successful. Please investigate it immediately.  @ ${env.BUILD_URL}  Application s7-KFC-app")
+              message: "KFC-app:   was not successful. Please investigate it immediately.  @ ${env.BUILD_URL} ")
   }
 }
