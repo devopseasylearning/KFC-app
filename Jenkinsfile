@@ -245,11 +245,10 @@ pipeline {
                 script {
 
                     sh '''
-rm -rf S4-projects-charts || true
-git clone git@github.com:devopseasylearning/S4-projects-charts.git
-cd S4-projects-charts
-ls
-pwd
+rm -rf KFC-app || true
+git clone git@github.com:devopseasylearning/KFC-app.git
+cd KFC-app
+
 cat << EOF > KFC-app/kfc-charts/dev-values.yaml
 image:
   repository: devopseasylearning/kfc
