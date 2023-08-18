@@ -318,7 +318,7 @@ post {
 
 
 def notifyUpgrade(String buildResult, String whereAt) {
-  if (Please_leave_this_section_as_it_is == 'origin/develop') {
+  if (Please_leave_this_section_as_it_is == 'origin/master') {
     channel = 'development-alerts'
   } else {
     channel = 'development-alerts'
