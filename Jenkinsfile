@@ -269,9 +269,7 @@ git push
       slackSend (channel: '#development-alerts', color: '#FF0000', message: "FAILURE: Application KFC Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
     }
    
-    cleanup {
-      deleteDir()
-    }
+
 }
 
 
