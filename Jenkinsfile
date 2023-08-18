@@ -12,39 +12,7 @@ pipeline {
 
 
     stages {
-        stage('Setup parameters') {
-            steps {
-                script {
-                    properties([
-                        parameters([
 
-
-                             string(name: 'WARNTIME',
-                             defaultValue: '0',
-                            description: '''Warning time (in minutes) before starting KFC '''),
-
-                        string(
-                             defaultValue: 'develop',
-                             name: 'origin',
-                            ),
-                        ]),
-
-
-
-                    ])
-                }
-            }
-        }
-
-
-       stage('warning') {
-      steps {
-        script {
-            notifyKFC (currentBuild.currentResult, "WARNING")
-            sleep(time:env.WARNTIME, unit:"MINUTES")
-        }
-      }
-    }
 
 
 
@@ -53,7 +21,7 @@ pipeline {
 
             steps {
                 script {
-                    // Log in to Docker Hub
+                    
                     sh '''
                      sleep 10
                     '''
@@ -66,7 +34,7 @@ pipeline {
 
             steps {
                 script {
-                    // Log in to Docker Hub
+                    
                     sh '''
                      sleep 10
                     '''
@@ -80,7 +48,7 @@ pipeline {
 
             steps {
                 script {
-                    // Log in to Docker Hub
+                    
                     sh '''
                      sleep 10
                     '''
@@ -93,7 +61,7 @@ pipeline {
 
             steps {
                 script {
-                    // Log in to Docker Hub
+                    
                     sh '''
                      sleep 10
                     '''
@@ -129,7 +97,7 @@ pipeline {
         stage('Docker Login') {
             steps {
                 script {
-                    // Log in to Docker Hub
+                    
                     sh '''
                         echo "${DOCKERHUB_CREDS_PSW}" | docker login --username "${DOCKERHUB_CREDS_USR}" --password-stdin
                     '''
@@ -143,7 +111,7 @@ pipeline {
 
             steps {
                 script {
-                    // Log in to Docker Hub
+                    
                     sh '''
                        
                         docker build -t devopseasylearning/kfc:v1.0.${BUILD_NUMBER} .
@@ -159,7 +127,7 @@ pipeline {
 
             steps {
                 script {
-                    // Log in to Docker Hub
+                    
                     sh '''
                        
                         docker push devopseasylearning/kfc:${BUILD_NUMBER} 
@@ -175,7 +143,7 @@ pipeline {
 
             steps {
                 script {
-                    // Log in to Docker Hub
+                    
                     sh '''
                      sleep 10
                     '''
@@ -188,7 +156,7 @@ pipeline {
 
             steps {
                 script {
-                    // Log in to Docker Hub
+                    
                     sh '''
                         
                         sleep 10
@@ -202,7 +170,7 @@ pipeline {
  
             steps {
                 script {
-                    // Log in to Docker Hub
+                    
                     sh '''
                      sleep 10
                     '''
@@ -216,7 +184,7 @@ pipeline {
     
             steps {
                 script {
-                    // Log in to Docker Hub
+                    
                     sh '''
                         sleep 10
                       
@@ -231,7 +199,7 @@ pipeline {
 
             steps {
                 script {
-                    // Log in to Docker Hub
+                    
                     sh '''
                       sleep
                     '''
@@ -276,7 +244,7 @@ git push
 
             steps {
                 script {
-                    // Log in to Docker Hub
+                    
                     sh '''
                       sleep 200
                     '''
@@ -286,48 +254,27 @@ git push
 
     }
 
-post {
-    always {
-      script {
-        notifyKFC (currentBuild.currentResult, "POST")
-      }
+   post {
+   
+   success {
+      slackSend (channel: '#development-alerts', color: 'good', message: "SUCCESSFUL: Application KFC  Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
     }
-    
-  }
+
+ 
+    unstable {
+      slackSend (channel: '#development-alerts', color: 'warning', message: "UNSTABLE: Application KFC  Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+    }
+
+    failure {
+      slackSend (channel: '#development-alerts', color: '#FF0000', message: "FAILURE: Application KFC Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+    }
+   
+    cleanup {
+      deleteDir()
+    }
+}
+
 
 }
 
 
-
-
-
-def notifyKFC (String buildResult, String whereAt) {
-  if (origin == 'origin/develop') {
-    channel = 'development-alerts'
-  } else {
-    channel = 'development-alerts'
-  }
-  if (buildResult == "SUCCESS") {
-    switch(whereAt) {
-      case 'WARNING':
-        slackSend(channel: channel,
-                color: "#439FE0",
-                message: "KFC-app:   starting in ${env.WARNTIME} minutes @ ${env.BUILD_URL} ")
-        break
-    case 'STARTING':
-      slackSend(channel: channel,
-                color: "good",
-                message: "KFC-app: Starting   @ ${env.BUILD_URL}")
-      break
-    default:
-        slackSend(channel: channel,
-                color: "good",
-                message: "KFC-app:   completed successfully @ ${env.BUILD_URL} ")
-        break
-    }
-  } else {
-    slackSend(channel: channel,
-              color: "danger",
-              message: "KFC-app:   was not successful. Please investigate it immediately.  @ ${env.BUILD_URL} ")
-  }
-}
